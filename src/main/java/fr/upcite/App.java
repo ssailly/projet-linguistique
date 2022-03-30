@@ -39,7 +39,6 @@ public class App extends Application {
 			public void handle(MouseEvent mouseEvent) {
 				firstStrokeOutside=-1;
 				path.getElements().add(new MoveTo(mouseEvent.getX(), mouseEvent.getY()));
-				System.out.println(lastStrokeInside+", "+firstStrokeOutside);
 			}
 		});
 		drawingPane.setOnMouseDragged(new EventHandler<MouseEvent>(){
