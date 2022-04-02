@@ -14,6 +14,7 @@ public class SVGtoPNG {
 		String pathTrgDir=Paths.get(".").toAbsolutePath().normalize().toString()+"/resources/kanji_svg_trg";
 		File srcDir=new File(pathSrcDir);
 		File trgDir=new File(pathTrgDir);
+		trgDir.mkdir();
 		for(File file:srcDir.listFiles()){
 			String newSvgCode=removeStrokeNumbers(file.getAbsolutePath());
 			createSvg(newSvgCode, pathTrgDir+"/"+file.getName());
