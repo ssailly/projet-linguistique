@@ -2,9 +2,6 @@ package fr.upcite;
 
 import java.io.File;
 import java.io.FileWriter;
-import java.io.IOException;
-import java.nio.file.FileAlreadyExistsException;
-import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Scanner;
 
@@ -17,10 +14,6 @@ public class SVGtoPNG {
 		String pathTrgDir=Paths.get(".").toAbsolutePath().normalize().toString()+"/resources/kanji_svg_trg";
 		File srcDir=new File(pathSrcDir);
 		File trgDir=new File(pathTrgDir);
-		if(!trgDir.mkdir()){
-			catchException(pathTrgDir, new IOException());
-			return;
-		}
 		for(File file:srcDir.listFiles()){
 			String newSvgCode=removeStrokeNumbers(file.getAbsolutePath());
 			createSvg(newSvgCode, pathTrgDir+"/"+file.getName());
