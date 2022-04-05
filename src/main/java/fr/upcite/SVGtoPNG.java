@@ -5,13 +5,20 @@ import java.io.FileWriter;
 import java.nio.file.Paths;
 import java.util.Scanner;
 
+
 public class SVGtoPNG {
 	/**
 	 * Exécuter depuis la racine du projet
 	 */
+	private static void createPng(){
+		
+	}
+
+
 	private static void createUsableKanji(){
 		String pathSrcDir=Paths.get(".").toAbsolutePath().normalize().toString()+"/resources/kanji_svg_src";
 		String pathTrgDir=Paths.get(".").toAbsolutePath().normalize().toString()+"/resources/kanji_svg_trg";
+		System.out.println(pathSrcDir);
 		File srcDir=new File(pathSrcDir);
 		File trgDir=new File(pathTrgDir);
 		trgDir.mkdir();
