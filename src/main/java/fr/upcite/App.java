@@ -1,5 +1,9 @@
 package fr.upcite;
 
+import java.awt.Graphics2D;
+import java.awt.RenderingHints;
+import java.awt.geom.AffineTransform;
+
 import java.io.File;
 import java.io.IOException;
 import java.lang.System.Logger;
@@ -23,10 +27,13 @@ import javafx.scene.shape.LineTo;
 import javafx.scene.shape.MoveTo;
 import javafx.scene.shape.Path;
 import javafx.stage.Stage;
+
+import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
 
 public class App extends Application {
 	private int firstStrokeOutside=-1, lastStrokeInside=-1;
+	private static final int IMG_SIZE=109;
 
 	@Override
 	public void start(Stage primaryStage) {
@@ -46,7 +53,7 @@ public class App extends Application {
 		
 
 		Path path=new Path();
-		path.setStrokeWidth(10);
+		//path.setStrokeWidth(1);
 		path.setStroke(Color.BLACK);
 		//path.setOpacity(1);
 		drawingPane.setOnMousePressed(new EventHandler<MouseEvent>() {
@@ -69,8 +76,13 @@ public class App extends Application {
 				//save image
 				WritableImage img = drawingPane.snapshot(new SnapshotParameters(), null);
 				BufferedImage img2 = SwingFXUtils.fromFXImage(img, null);
+				BufferedImage img3 = new BufferedImage(IMG_SIZE, IMG_SIZE, img2.getType());
+				Graphics2D g = img3.createGraphics();
+				g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+				g.drawImage(img2, 0, 0, IMG_SIZE, IMG_SIZE, 0, 0, img2.getWidth(), img2.getHeight(), null);
+				g.dispose();
 				try {
-					ImageIO.write(img2, "png", new File(Paths.get(".").toAbsolutePath().normalize().toString()+"/resources/image_output/image.png"));
+					ImageIO.write(img3, "png", new File(Paths.get(".").toAbsolutePath().normalize().toString()+"/resources/image_output/image.png"));
 				} catch (IOException ex) {
 					//Logger.getLogger(GuiClass.class.getName()).log(Level.SEVERE, null, ex);
 				}
