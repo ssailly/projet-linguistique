@@ -1,8 +1,8 @@
 package fr.upcite;
 
-import org.apache.batik.transcoder.image.PNGTranscoder;
+/*import org.apache.batik.transcoder.image.PNGTranscoder;
 import org.apache.batik.transcoder.TranscoderInput;
-import org.apache.batik.transcoder.TranscoderOutput;
+import org.apache.batik.transcoder.TranscoderOutput;*/
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -70,7 +70,7 @@ public class SVGtoPNG {
 	}
 
 	private static void svgToPng(String svgPath, String pngPath){
-		try{
+		/*try{
 			TranscoderInput input_svg_image = new TranscoderInput(new FileInputStream(svgPath));
 			OutputStream png_ostream = new FileOutputStream(pngPath);
 			TranscoderOutput output_png_image = new TranscoderOutput(png_ostream);
@@ -80,7 +80,7 @@ public class SVGtoPNG {
 			png_ostream.close();
 		} catch(Exception e){
 			catchException(svgPath, e);
-		}
+		}*/
 	}
 	
 	private static void catchException(String path, Exception e){

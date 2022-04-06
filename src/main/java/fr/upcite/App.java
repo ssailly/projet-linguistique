@@ -28,10 +28,6 @@ import java.awt.image.BufferedImage;
 public class App extends Application {
 	private int firstStrokeOutside=-1, lastStrokeInside=-1;
 
-	
-
-
-
 	@Override
 	public void start(Stage primaryStage) {
 		Pane drawingPane=new Pane(), proposalsPane=new Pane();
@@ -50,7 +46,7 @@ public class App extends Application {
 		
 
 		Path path=new Path();
-		//path.setStrokeWidth(1);
+		path.setStrokeWidth(10);
 		path.setStroke(Color.BLACK);
 		//path.setOpacity(1);
 		drawingPane.setOnMousePressed(new EventHandler<MouseEvent>() {
