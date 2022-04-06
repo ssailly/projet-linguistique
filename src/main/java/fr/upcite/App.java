@@ -74,7 +74,9 @@ public class App extends Application {
 				}
 				else lastStrokeInside=firstStrokeOutside;
 				//save image
-				WritableImage img = drawingPane.snapshot(new SnapshotParameters(), null);
+				SnapshotParameters sp=new SnapshotParameters();
+				sp.setFill(Color.TRANSPARENT);
+				WritableImage img = drawingPane.snapshot(sp, null);
 				BufferedImage img2 = SwingFXUtils.fromFXImage(img, null);
 				BufferedImage img3 = new BufferedImage(IMG_SIZE, IMG_SIZE, img2.getType());
 				Graphics2D g = img3.createGraphics();
