@@ -24,13 +24,17 @@ public class SVGtoPNG {
 		System.out.println(pathSrcDir);
 		File srcDir=new File(pathSrcDir);
 		File trgDir=new File(pathTrgDir);
+		File pngDir=new File(pathPngDir);
 		trgDir.mkdir();
+		pngDir.mkdir();
+		int i=1;
 		for(File file:srcDir.listFiles()){
 			String newSvgCode=removeStrokeNumbers(file.getAbsolutePath());
 			String newSvgPath=pathTrgDir+"/"+file.getName();
-			String pngPath=pathPngDir+"/"+file.getName().substring(0, file.getName().length()-3)+"svg";
+			String pngPath=pathPngDir+"/"+file.getName().substring(0, file.getName().length()-3)+"png";
 			createSvg(newSvgCode, newSvgPath);
 			svgToPng(newSvgPath, pngPath);
+			System.out.println(i+++"/"+srcDir.listFiles().length);
 		}
 	}
 
