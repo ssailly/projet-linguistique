@@ -10,8 +10,9 @@
 	+ [x] Récupérer l'image tracée
 	+ [x] Mettre aux mêmes dimensions
 	+ [x] image_output transparent (optionnel)
-	+ [ ] Comparer kanji_svg_trg - image_output
-	+ [ ] Donner le(s) plus semblable(s) (complexité ?)
+	+ [x] Comparer kanji_svg_trg - image_output
+	+ [x] Donner le(s) plus semblable(s) 
+		+ [ ] Améliorer le calcul
 + Passer à une réelle écriture manuscrite
 	+ Utiliser genkō yōshi ?
 	+ [ ] Reconnaître un unique caractère
