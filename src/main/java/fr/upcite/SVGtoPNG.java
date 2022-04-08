@@ -5,10 +5,7 @@ import org.apache.batik.transcoder.TranscoderInput;
 import org.apache.batik.transcoder.TranscoderOutput;*/
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.FileWriter;
-import java.io.OutputStream; 
 import java.nio.file.Paths;
 import java.util.Scanner;
 
@@ -51,7 +48,7 @@ public class SVGtoPNG {
 				}
 			}
 		} catch (Exception e) {
-			catchException(path, e);
+			App.catchException(e, path);
 		}
 		return(s);
 	}
@@ -65,7 +62,7 @@ public class SVGtoPNG {
 				writer.close();
 			}
 		} catch (Exception e) {
-			catchException(path, e);
+			App.catchException(e, path);
 		}
 	}
 
@@ -79,13 +76,8 @@ public class SVGtoPNG {
 			png_ostream.flush();
 			png_ostream.close();
 		} catch(Exception e){
-			catchException(svgPath, e);
+			catchException(e, svgPath);
 		}*/
-	}
-	
-	private static void catchException(String path, Exception e){
-		System.err.println("Path: "+path);
-		e.printStackTrace();
 	}
 
 	public static void main(String[] args){

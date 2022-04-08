@@ -1,26 +1,11 @@
 package fr.upcite;
 
-import java.awt.Graphics2D;
-import java.awt.RenderingHints;
-
-import java.io.File;
-import java.io.IOException;
-import java.lang.System.Logger;
-import java.nio.file.Paths;
-
-import javax.imageio.ImageIO;
-import javax.swing.JFileChooser;
-
 import javafx.application.Application;
-import javafx.collections.ObservableList;
-import javafx.embed.swing.SwingFXUtils;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.Scene;
-import javafx.scene.SnapshotParameters;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.image.WritableImage;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
@@ -29,10 +14,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.LineTo;
 import javafx.scene.shape.MoveTo;
 import javafx.scene.shape.Path;
-import javafx.scene.shape.PathElement;
 import javafx.stage.Stage;
-
-import java.awt.image.BufferedImage;
 
 public class App extends Application {
 	private int firstStrokeOutside=-1, lastStrokeInside=-1;
@@ -94,6 +76,11 @@ public class App extends Application {
 		primaryStage.setScene(scene);
 		primaryStage.setResizable(false);
 		primaryStage.show();
+	}
+
+	public static void catchException(Exception e, String ... path) {
+		for(String p:path) System.err.println("Path: "+p);
+		e.printStackTrace();
 	}
 
 	public static void main(String[] args) {
