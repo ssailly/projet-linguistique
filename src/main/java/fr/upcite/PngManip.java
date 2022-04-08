@@ -62,8 +62,10 @@ public class PngManip {
 				for(int x=0;x<w1;x++){
 					int rgb1=img1.getRGB(x, y), rgb2=img2.getRGB(x, y);
 					int alpha1=(rgb1>>24)&0xFF, alpha2=(rgb2>>24)&0xFF;
-					if(alpha1!=0 || alpha2!=0) pertinent++;
-					if(alpha1!=alpha2) diff++;
+					if(/*alpha1!=0 || */alpha2!=0) {
+						pertinent++;
+						if(alpha1!=alpha2) diff++;
+					}
 				}
 			}
 			return 1-(diff/pertinent);
