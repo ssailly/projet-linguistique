@@ -1,7 +1,6 @@
 package fr.upcite;
 
 import java.awt.Graphics2D;
-import java.awt.Image;
 import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -9,7 +8,6 @@ import java.io.IOException;
 import java.nio.file.Paths;
 
 import javax.imageio.ImageIO;
-import javax.swing.ImageIcon;
 
 import javafx.embed.swing.SwingFXUtils;
 import javafx.scene.SnapshotParameters;
@@ -73,4 +71,6 @@ public class PngManip {
 		}
 		return 0.0;
 	}
+
+	
 }

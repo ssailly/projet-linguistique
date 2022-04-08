@@ -1,5 +1,7 @@
 package fr.upcite;
 
+import java.util.ArrayList;
+
 import javafx.application.Application;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -18,6 +20,7 @@ import javafx.stage.Stage;
 
 public class App extends Application {
 	private int firstStrokeOutside=-1, lastStrokeInside=-1;
+	private ArrayList<Kanji> kanji=Kanji.createList();
 
 	@Override
 	public void start(Stage primaryStage) {
