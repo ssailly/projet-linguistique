@@ -1,6 +1,9 @@
 package fr.upcite;
 
+import java.io.File;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 
 import javafx.application.Application;
 import javafx.event.ActionEvent;
@@ -12,6 +15,7 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
+import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.LineTo;
 import javafx.scene.shape.MoveTo;
@@ -20,7 +24,7 @@ import javafx.stage.Stage;
 
 public class App extends Application {
 	private int firstStrokeOutside=-1, lastStrokeInside=-1;
-	private ArrayList<Kanji> kanji=Kanji.createList();
+	private static ArrayList<Kanji> kanji=Kanji.createList();
 
 	@Override
 	public void start(Stage primaryStage) {
@@ -34,10 +38,12 @@ public class App extends Application {
 		proposalsPane.setMaxSize(200, 200);
 		proposalsPane.setTop(new Label("Proposals"));
 
+		VBox proposals=new VBox();
+		proposalsPane.setCenter(proposals);
+
 		Path path=new Path();
-		//path.setStrokeWidth(1);
+		path.setStrokeWidth(5);
 		path.setStroke(Color.BLACK);
-		//path.setOpacity(1);
 
 		Button clear=new Button("Clear");
 		clear.setOnAction(new EventHandler<ActionEvent>() {
@@ -45,6 +51,7 @@ public class App extends Application {
 			public void handle(ActionEvent event) {
 				path.getElements().clear();
 				PngManip.saveImage(drawingPane);
+				proposals.getChildren().clear();
 			}
 		});
 
@@ -68,6 +75,8 @@ public class App extends Application {
 				}
 				else lastStrokeInside=firstStrokeOutside;
 				PngManip.saveImage(drawingPane);
+				updateList();
+				updateProposals(proposals);
 			}
 		});
 		drawingPane.getChildren().add(path);
@@ -79,6 +88,40 @@ public class App extends Application {
 		primaryStage.setScene(scene);
 		primaryStage.setResizable(false);
 		primaryStage.show();
+	}
+	
+	private static void updateList() {
+		for(Kanji k:kanji){
+			k.setSimilarity(PngManip.imagesSimilarity(PngManip.output_path, PngManip.kanji_png+k.filename));
+		}
+	}
+
+	private static void updateProposals(VBox proposals){
+		ArrayList<Kanji> max=getNbMax(5);
+		proposals.getChildren().clear();
+		for(Kanji k:max){
+			HBox hbox=new HBox(new Label(k.kanji), new Label(String.valueOf(k.getSimilarity())));
+			proposals.getChildren().add(hbox);
+		}
+	}
+
+	private static ArrayList<Kanji> getNbMax(int nb) {
+		ArrayList<Kanji> res=new ArrayList<>();
+		for(int i=0;i<nb;i++) res.add(kanji.get(i));
+		Comparator<Kanji> comp=Kanji.getComparator();
+		Collections.sort(res, comp);
+		for(int i=nb;i<kanji.size();i++){
+			boolean superior=false;
+			Kanji curr=kanji.get(i);
+			for(Kanji k:res) superior|=k.getSimilarity()<curr.getSimilarity();
+			if(superior){
+				res.remove(0);
+				res.add(curr);
+			}
+			Collections.sort(res, comp);
+		}
+		Collections.reverse(res);
+		return res;
 	}
 
 	public static void catchException(Exception e, String ... path) {

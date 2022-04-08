@@ -17,6 +17,8 @@ import javafx.scene.paint.Color;
 
 public class PngManip {
 	private static final int IMG_SIZE=109;
+	public static final String output_path=Paths.get(".").toAbsolutePath().normalize().toString()+"/resources/image_output/image.png";
+	public static final String kanji_png=Paths.get(".").toAbsolutePath().normalize().toString()+"/resources/kanji_png/";
 
 	public static void saveImage(Pane drawingPane){
 		SnapshotParameters sp=new SnapshotParameters();
@@ -29,7 +31,7 @@ public class PngManip {
 		g.drawImage(img2, 0, 0, IMG_SIZE, IMG_SIZE, 0, 0, img2.getWidth(), img2.getHeight(), null);
 		g.dispose();
 		try {
-			ImageIO.write(img3, "png", new File(Paths.get(".").toAbsolutePath().normalize().toString()+"/resources/image_output/image.png"));
+			ImageIO.write(img3, "png", new File(output_path));
 		} catch (IOException ex) {
 			//Logger.getLogger(GuiClass.class.getName()).log(Level.SEVERE, null, ex);
 		}

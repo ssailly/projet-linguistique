@@ -2,6 +2,7 @@ package fr.upcite;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Comparator;
 
 public class Kanji {
 	public final String kanji, filename;
@@ -22,6 +23,14 @@ public class Kanji {
 			res.add(new Kanji(""+k, filename));
 		}
 		return res;
+	}
+
+	public static Comparator<Kanji> getComparator(){
+		return new Comparator<Kanji>() {
+			public int compare(Kanji k1, Kanji k2){
+				return k1.getSimilarity()<k2.getSimilarity()?-1:k1.getSimilarity()>k2.getSimilarity()?1:0;
+			}
+		};
 	}
 
 	@Override
