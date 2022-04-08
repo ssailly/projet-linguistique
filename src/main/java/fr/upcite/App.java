@@ -36,7 +36,6 @@ import java.awt.image.BufferedImage;
 
 public class App extends Application {
 	private int firstStrokeOutside=-1, lastStrokeInside=-1;
-	private static final int IMG_SIZE=109;
 
 	@Override
 	public void start(Stage primaryStage) {
@@ -60,7 +59,7 @@ public class App extends Application {
 			@Override
 			public void handle(ActionEvent event) {
 				path.getElements().clear();
-				saveImage(drawingPane);
+				PngManip.saveImage(drawingPane);
 			}
 		});
 
@@ -83,7 +82,7 @@ public class App extends Application {
 					firstStrokeOutside++;
 				}
 				else lastStrokeInside=firstStrokeOutside;
-				saveImage(drawingPane);
+				PngManip.saveImage(drawingPane);
 			}
 		});
 		drawingPane.getChildren().add(path);
@@ -95,23 +94,6 @@ public class App extends Application {
 		primaryStage.setScene(scene);
 		primaryStage.setResizable(false);
 		primaryStage.show();
-	}
-
-	private static void saveImage(Pane drawingPane){
-		SnapshotParameters sp=new SnapshotParameters();
-		sp.setFill(Color.TRANSPARENT);
-		WritableImage img = drawingPane.snapshot(sp, null);
-		BufferedImage img2 = SwingFXUtils.fromFXImage(img, null);
-		BufferedImage img3 = new BufferedImage(IMG_SIZE, IMG_SIZE, img2.getType());
-		Graphics2D g = img3.createGraphics();
-		g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
-		g.drawImage(img2, 0, 0, IMG_SIZE, IMG_SIZE, 0, 0, img2.getWidth(), img2.getHeight(), null);
-		g.dispose();
-		try {
-			ImageIO.write(img3, "png", new File(Paths.get(".").toAbsolutePath().normalize().toString()+"/resources/image_output/image.png"));
-		} catch (IOException ex) {
-			//Logger.getLogger(GuiClass.class.getName()).log(Level.SEVERE, null, ex);
-		}
 	}
 
 	public static void main(String[] args) {
