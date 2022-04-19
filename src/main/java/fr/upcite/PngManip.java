@@ -2,14 +2,18 @@ package fr.upcite;
 
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
+import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.imageio.ImageIO;
 
 import javafx.embed.swing.SwingFXUtils;
+import javafx.scene.shape.Path;
 import javafx.scene.SnapshotParameters;
 import javafx.scene.image.WritableImage;
 import javafx.scene.layout.Pane;
@@ -20,7 +24,7 @@ public class PngManip {
 	public static final String output_path=Paths.get(".").toAbsolutePath().normalize().toString()+"/resources/image_output/image.png";
 	public static final String kanji_png=Paths.get(".").toAbsolutePath().normalize().toString()+"/resources/kanji_png/";
 
-	public static void saveImage(Pane drawingPane){
+	public static void saveImage(Path drawingPane){
 		SnapshotParameters sp=new SnapshotParameters();
 		sp.setFill(Color.TRANSPARENT);
 		WritableImage img = drawingPane.snapshot(sp, null);
@@ -29,6 +33,8 @@ public class PngManip {
 		Graphics2D g = img3.createGraphics();
 		g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
 		g.drawImage(img2, 0, 0, IMG_SIZE, IMG_SIZE, 0, 0, img2.getWidth(), img2.getHeight(), null);
+		/*AffineTransform affTrans=new AffineTransform();
+		g.drawImage(img2, affTrans, null);*/
 		g.dispose();
 		try {
 			ImageIO.write(img3, "png", new File(output_path));
@@ -48,7 +54,7 @@ public class PngManip {
 		return res;
 	}
 
-	//on ne compare que la transparence 
+	//on ne compare que la transparence
 	private static double imagesSimilarity(File f1, File f2){
 		try{
 			BufferedImage img1=ImageIO.read(f1), img2=ImageIO.read(f2);
@@ -62,13 +68,26 @@ public class PngManip {
 				for(int x=0;x<w1;x++){
 					int rgb1=img1.getRGB(x, y), rgb2=img2.getRGB(x, y);
 					int alpha1=(rgb1>>24)&0xFF, alpha2=(rgb2>>24)&0xFF;
-					if(/*alpha1!=0 || */alpha2!=0) {
+					ArrayList<Integer> alphaAround=new ArrayList<>();
+					for(int j=y-3;j<=y+3;j++){
+						for(int i=x-3;i<=x+3;i++){
+							if(i!=x && j!=y && i>0 && j>0 && i<w1 && j<h1){
+								int rgb=img2.getRGB(i, j);
+								alphaAround.add((rgb>>24)&0xFF);
+							}
+						}
+					}
+					if(alpha2!=0) {
 						pertinent++;
-						if(alpha1!=alpha2) diff++;
+						if(alpha1==0) diff++;
+						for(Integer i:alphaAround){
+							if(i!=0) diff-=1.0/alphaAround.size();
+						}
 					}
 				}
 			}
-			return 1-(diff/pertinent);
+			double ratio=1-(diff/pertinent), res=ratio>1.0?1.0:ratio;
+			return res;
 
 		} catch(Exception e){
 			App.catchException(e, f1.getAbsolutePath(), f2.getAbsolutePath());
@@ -76,5 +95,7 @@ public class PngManip {
 		return 0.0;
 	}
 
-	
+	public static void main(String[] args) {
+		imagesSimilarity(PngManip.output_path, PngManip.kanji_png+"0608b.png");
+	}
 }
