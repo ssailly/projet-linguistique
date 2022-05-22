@@ -11,12 +11,19 @@
     </properties>
     <dependencies>
         <dependency>
+            <groupId>ai.djl.opencv</groupId>
+            <artifactId>opencv</artifactId>
+            <version>0.17.0</version>
+        </dependency>
+        
+
+        <dependency>
             <groupId>org.apache.xmlgraphics</groupId>
             <artifactId>batik-all</artifactId>
             <version>1.14</version>
             <type>pom</type>
         </dependency>
-      
+
         <dependency>
             <groupId>org.openjfx</groupId>
             <artifactId>javafx-swing</artifactId>

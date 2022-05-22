@@ -24,7 +24,7 @@ public class PngManip {
 	public static final String output_path=Paths.get(".").toAbsolutePath().normalize().toString()+"/resources/image_output/image.png";
 	public static final String kanji_png=Paths.get(".").toAbsolutePath().normalize().toString()+"/resources/kanji_png/";
 
-	public static void saveImage(Path drawingPane){
+	public static void saveImage(Pane drawingPane){
 		SnapshotParameters sp=new SnapshotParameters();
 		sp.setFill(Color.TRANSPARENT);
 		WritableImage img = drawingPane.snapshot(sp, null);
