@@ -1,41 +1,101 @@
 package fr.upcite;
 
+import java.awt.Color;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 import javax.imageio.ImageIO;
 
-import org.opencv.core.Core;
 import org.opencv.core.Mat;
 import org.opencv.core.MatOfByte;
+import org.opencv.core.MatOfPoint;
+import org.opencv.core.Point;
+import org.opencv.core.Rect;
+import org.opencv.core.Scalar;
 import org.opencv.imgcodecs.Imgcodecs;
 import org.opencv.imgproc.Imgproc;
 
 public class Handwriting {
 	private static final String DIR = Paths.get(".").toAbsolutePath().normalize().toString() + "/resources/handwriting/";
-	private static final String TRG = "trg.png";
+	private static final String DEFAULT_TRG = "trg.png";
 
-	private static void saveMat(Mat mat) {
+	private static void saveMat(Mat mat, String trg) {
+		if(trg.equals("")) trg = DEFAULT_TRG;
 		MatOfByte mob = new MatOfByte();
 		Imgcodecs.imencode(".png", mat, mob);
 		byte ba[] = mob.toArray();
 		try {
 			BufferedImage img = ImageIO.read(new ByteArrayInputStream(ba));
-			ImageIO.write(img, "png", new File(DIR + TRG));
+			ImageIO.write(img, "png", new File(DIR + trg));
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 	}
 
 	public static void main(String[] args) {
-		String src = args.length > 0 ? args[0] : DIR + "src.png";
+		String src = args.length > 0 ? args[0].substring(0, args[0].length() - 4) : DIR + "src";
 		nu.pattern.OpenCV.loadLocally();
-		Mat mat = Imgcodecs.imread(src, Imgcodecs.IMREAD_GRAYSCALE);
-		Mat matBlackAndWhite = new Mat();
-		Imgproc.adaptiveThreshold(mat, matBlackAndWhite, 255, Imgproc.ADAPTIVE_THRESH_MEAN_C, Imgproc.THRESH_BINARY, 15, 40);
-		saveMat(matBlackAndWhite);
+		Mat orig = Imgcodecs.imread(src);
+		Mat mat = new Mat();
+		orig.copyTo(mat);
+		Mat matGrey = new Mat();
+		Imgproc.cvtColor(mat, matGrey, Imgproc.COLOR_BGR2GRAY);
+
+		Mat canny = new Mat();
+		Imgproc.Canny(matGrey, canny, 60, 60 * 3, 3, false);
+
+		Mat cannyColor = new Mat();
+		Imgproc.cvtColor(canny, cannyColor, Imgproc.COLOR_GRAY2BGR);
+
+		Mat lines = new Mat();
+		Imgproc.HoughLines(canny, lines, 1, Math.PI/180, 150);
+		List<Integer> l = List.of(0, 1, 1999, 2000);
+		ArrayList<ArrayList<Integer>> pts = new ArrayList<>();
+		ArrayList<Integer> x = new ArrayList<>(), y = new ArrayList<>();
+		x.add(0);
+		y.add(0);
+		pts.add(x);
+		pts.add(y);
+		for(int i = 0; i < lines.rows(); i++){
+			double[] data = lines.get(i, 0);
+			double rho = data[0], theta = data[1];
+			double a = Math.cos(theta), b = Math.sin(theta);
+			double x0 = a * rho, y0 = b * rho;
+			Point p1 = new Point(Math.round(x0 + 1000 * (-b)), y0 + 1000 * a), p2 = new Point(Math.round(x0 - 1000 * (-b)), y0 - 1000 * a);
+			
+			Rect r = new Rect(p1, p2);
+			if(l.contains(r.height) && l.contains(r.width)) {
+				if(Math.abs((int)p1.x) != 1000) pts.get(0).add((int)p1.x);
+				else pts.get(1).add((int)p1.y);
+				Imgproc.line(mat, p1, p2, new Scalar(0, 255, 0), 2);
+				Imgproc.line(cannyColor, p1, p2, new Scalar(0, 255, 0), 2);
+			}
+		}
+		saveMat(mat, DIR + src + "_houghLines.png");
+		saveMat(cannyColor, DIR + src + "_houghLinesCanny.png");
+		for(ArrayList<Integer> list : pts) Collections.sort(list);
+
+		int k = 0;
+		for(int i = 0; i < pts.get(0).size() - 1; i++){
+			for(int j = 0; j < pts.get(1).size() - 1; j++){
+				int rowStart = pts.get(1).get(j), rowEnd = pts.get(1).get(j+1);
+				int colStart = pts.get(0).get(i), colEnd = pts.get(0).get(i+1);
+				int h1 = rowEnd - rowStart, h2 = colEnd - colStart;
+				if(h1 < 1.1 * h2 && h1 > 0.9 * h2 && h1 > 5 && h2 > 5){
+					Mat roi = orig.submat(rowStart, rowEnd, colStart, colEnd);
+					Mat roiGrey = new Mat();
+					Imgproc.cvtColor(roi, roiGrey, Imgproc.COLOR_BGR2GRAY);
+					Mat roiBW = new Mat();
+					Imgproc.adaptiveThreshold(roiGrey, roiBW, 255,Imgproc.ADAPTIVE_THRESH_MEAN_C, Imgproc.THRESH_BINARY, 15, 40);
+					saveMat(roiBW, DIR + src + "_roi" + ++k + ".png");
+				}
+			}
+		}
 	}
 }
