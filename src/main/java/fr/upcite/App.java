@@ -1,6 +1,5 @@
 package fr.upcite;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -23,29 +22,29 @@ import javafx.scene.shape.Path;
 import javafx.stage.Stage;
 
 public class App extends Application {
-	private int firstStrokeOutside=-1, lastStrokeInside=-1;
-	private static ArrayList<Kanji> kanji=Kanji.createList();
+	private int firstStrokeOutside = -1, lastStrokeInside = -1;
+	private static ArrayList<Kanji> kanji = Kanji.createList();
 
 	@Override
 	public void start(Stage primaryStage) {
-		Pane drawingPane=new Pane();
-		BorderPane proposalsPane=new BorderPane();
+		Pane drawingPane = new Pane();
+		BorderPane proposalsPane = new BorderPane();
 		drawingPane.setMinSize(200, 200);
 		drawingPane.setMaxSize(200, 200);
 		drawingPane.setStyle("-fx-background-color: transparent; ");
-		
+
 		proposalsPane.setMinSize(200, 200);
 		proposalsPane.setMaxSize(200, 200);
 		proposalsPane.setTop(new Label("Proposals"));
 
-		VBox proposals=new VBox();
+		VBox proposals = new VBox();
 		proposalsPane.setCenter(proposals);
 
-		Path path=new Path();
+		Path path = new Path();
 		path.setStrokeWidth(5);
 		path.setStroke(Color.BLACK);
 
-		Button clear=new Button("Clear");
+		Button clear = new Button("Clear");
 		clear.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent event) {
@@ -56,24 +55,24 @@ public class App extends Application {
 		});
 
 		proposalsPane.setBottom(new HBox(clear));
-		
+
 		drawingPane.setOnMousePressed(new EventHandler<MouseEvent>() {
 			@Override
 			public void handle(MouseEvent mouseEvent) {
-				firstStrokeOutside=-1;
+				firstStrokeOutside = -1;
 				path.getElements().add(new MoveTo(mouseEvent.getX(), mouseEvent.getY()));
 			}
 		});
-		drawingPane.setOnMouseDragged(new EventHandler<MouseEvent>(){
+		drawingPane.setOnMouseDragged(new EventHandler<MouseEvent>() {
 			@Override
 			public void handle(MouseEvent mouseEvent) {
-				double x=mouseEvent.getX(), y=mouseEvent.getY();
-				boolean inDrawingPane=x<drawingPane.getWidth() && y<drawingPane.getHeight();
-				if(inDrawingPane && lastStrokeInside==-1) {
+				double x = mouseEvent.getX(), y = mouseEvent.getY();
+				boolean inDrawingPane = x < drawingPane.getWidth() && y < drawingPane.getHeight();
+				if (inDrawingPane && lastStrokeInside == -1) {
 					path.getElements().add(new LineTo(x, y));
 					firstStrokeOutside++;
-				}
-				else lastStrokeInside=firstStrokeOutside;
+				} else
+					lastStrokeInside = firstStrokeOutside;
 				PngManip.saveImage(drawingPane);
 				updateList();
 				updateProposals(proposals);
@@ -81,40 +80,42 @@ public class App extends Application {
 		});
 		drawingPane.getChildren().add(path);
 
-		BorderPane borderPane=new BorderPane();
+		BorderPane borderPane = new BorderPane();
 		borderPane.setLeft(drawingPane);
 		borderPane.setRight(proposalsPane);
-		Scene scene=new Scene(borderPane);
+		Scene scene = new Scene(borderPane);
 		primaryStage.setScene(scene);
 		primaryStage.setResizable(false);
 		primaryStage.show();
 	}
-	
+
 	private static void updateList() {
-		for(Kanji k:kanji){
-			k.setSimilarity(PngManip.imagesSimilarity(PngManip.output_path, PngManip.kanji_png+k.filename));
+		for (Kanji k : kanji) {
+			k.setSimilarity(PngManip.imagesSimilarity(PngManip.output_path, PngManip.kanji_png + k.filename));
 		}
 	}
 
-	private static void updateProposals(VBox proposals){
-		ArrayList<Kanji> max=getNbMax(5);
+	private static void updateProposals(VBox proposals) {
+		ArrayList<Kanji> max = getNbMax(5);
 		proposals.getChildren().clear();
-		for(Kanji k:max){
-			HBox hbox=new HBox(new Label(k.kanji), new Label(String.valueOf(k.getSimilarity())));
+		for (Kanji k : max) {
+			HBox hbox = new HBox(new Label(k.kanji), new Label(String.valueOf(k.getSimilarity())));
 			proposals.getChildren().add(hbox);
 		}
 	}
 
 	private static ArrayList<Kanji> getNbMax(int nb) {
-		ArrayList<Kanji> res=new ArrayList<>();
-		for(int i=0;i<nb;i++) res.add(kanji.get(i));
-		Comparator<Kanji> comp=Kanji.getComparator();
+		ArrayList<Kanji> res = new ArrayList<>();
+		for (int i = 0; i < nb; i++)
+			res.add(kanji.get(i));
+		Comparator<Kanji> comp = Kanji.getComparator();
 		Collections.sort(res, comp);
-		for(int i=nb;i<kanji.size();i++){
-			boolean superior=false;
-			Kanji curr=kanji.get(i);
-			for(Kanji k:res) superior|=k.getSimilarity()<curr.getSimilarity();
-			if(superior){
+		for (int i = nb; i < kanji.size(); i++) {
+			boolean superior = false;
+			Kanji curr = kanji.get(i);
+			for (Kanji k : res)
+				superior |= k.getSimilarity() < curr.getSimilarity();
+			if (superior) {
 				res.remove(0);
 				res.add(curr);
 			}
@@ -124,8 +125,9 @@ public class App extends Application {
 		return res;
 	}
 
-	public static void catchException(Exception e, String ... path) {
-		for(String p:path) System.err.println("Path: "+p);
+	public static void catchException(Exception e, String... path) {
+		for (String p : path)
+			System.err.println("Path: " + p);
 		e.printStackTrace();
 	}
 

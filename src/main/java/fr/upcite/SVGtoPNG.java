@@ -1,9 +1,5 @@
 package fr.upcite;
 
-/*import org.apache.batik.transcoder.image.PNGTranscoder;
-import org.apache.batik.transcoder.TranscoderInput;
-import org.apache.batik.transcoder.TranscoderOutput;*/
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
