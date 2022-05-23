@@ -5,9 +5,16 @@ import org.apache.batik.transcoder.TranscoderInput;
 import org.apache.batik.transcoder.TranscoderOutput;*/
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.FileWriter;
+import java.io.OutputStream;
 import java.nio.file.Paths;
 import java.util.Scanner;
+
+import org.apache.batik.transcoder.TranscoderInput;
+import org.apache.batik.transcoder.TranscoderOutput;
+import org.apache.batik.transcoder.image.PNGTranscoder;
 
 
 public class SVGtoPNG {
@@ -67,7 +74,7 @@ public class SVGtoPNG {
 	}
 
 	private static void svgToPng(String svgPath, String pngPath){
-		/*try{
+		try{
 			TranscoderInput input_svg_image = new TranscoderInput(new FileInputStream(svgPath));
 			OutputStream png_ostream = new FileOutputStream(pngPath);
 			TranscoderOutput output_png_image = new TranscoderOutput(png_ostream);
@@ -76,8 +83,8 @@ public class SVGtoPNG {
 			png_ostream.flush();
 			png_ostream.close();
 		} catch(Exception e){
-			catchException(e, svgPath);
-		}*/
+			App.catchException(e, svgPath);
+		}
 	}
 
 	public static void main(String[] args){

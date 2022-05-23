@@ -6,6 +6,7 @@ module fr.upcite {
     requires transitive javafx.graphics;
 
     requires opencv;
+    requires batik.transcoder;
 
     opens fr.upcite to javafx.fxml;
     exports fr.upcite;
