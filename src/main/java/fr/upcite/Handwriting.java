@@ -1,9 +1,9 @@
 package fr.upcite;
 
-import java.awt.Color;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -14,7 +14,6 @@ import javax.imageio.ImageIO;
 
 import org.opencv.core.Mat;
 import org.opencv.core.MatOfByte;
-import org.opencv.core.MatOfPoint;
 import org.opencv.core.Point;
 import org.opencv.core.Rect;
 import org.opencv.core.Scalar;
@@ -24,6 +23,7 @@ import org.opencv.imgproc.Imgproc;
 public class Handwriting {
 	private static final String DIR = Paths.get(".").toAbsolutePath().normalize().toString() + "/resources/handwriting/";
 	private static final String DEFAULT_TRG = "trg.png";
+	private static ArrayList<Kanji> kanji=Kanji.createList();
 
 	private static void saveMat(Mat mat, String trg) {
 		if(trg.equals("")) trg = DEFAULT_TRG;
@@ -82,6 +82,7 @@ public class Handwriting {
 		for(ArrayList<Integer> list : pts) Collections.sort(list);
 
 		int k = 0;
+		ArrayList<String> roiFilenames = new ArrayList<>();
 		for(int i = 0; i < pts.get(0).size() - 1; i++){
 			for(int j = 0; j < pts.get(1).size() - 1; j++){
 				int rowStart = pts.get(1).get(j), rowEnd = pts.get(1).get(j+1);
@@ -93,9 +94,28 @@ public class Handwriting {
 					Imgproc.cvtColor(roi, roiGrey, Imgproc.COLOR_BGR2GRAY);
 					Mat roiBW = new Mat();
 					Imgproc.adaptiveThreshold(roiGrey, roiBW, 255,Imgproc.ADAPTIVE_THRESH_MEAN_C, Imgproc.THRESH_BINARY, 15, 40);
-					saveMat(roiBW, DIR + src + "_roi" + ++k + ".png");
+					String roiFilename = DIR + src + "_roi";
+					saveMat(roiBW, roiFilename + ++k + ".png");
+					roiFilenames.add(roiFilename);
 				}
 			}
+		}
+		try {
+			File result = new File(DIR + src + "_output.txt");
+			result.createNewFile();
+			FileWriter writer = new FileWriter(result.getAbsolutePath());
+			for(String s : roiFilenames) {
+				for(Kanji kj : kanji){
+					kj.setSimilarity(PngManip.imagesSimilarity(s, PngManip.kanji_png+kj.filename));
+				}
+				Kanji sim = Collections.max(kanji, Kanji.getComparator());
+				char toWrite = sim.kanji.charAt(0);
+				if(sim.getSimilarity() < 0.5) toWrite = ' ';
+				writer.write(toWrite);
+			}
+			writer.close();
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
 	}
 }

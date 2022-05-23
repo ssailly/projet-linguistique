@@ -1,6 +1,7 @@
 package fr.upcite;
 
 import java.io.File;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Comparator;
 
@@ -15,7 +16,7 @@ public class Kanji {
 
 	public static ArrayList<Kanji> createList(){
 		ArrayList<Kanji> res=new ArrayList<>();
-		File folder=new File("H:/[2021-2022] L3/S2/Linguistique/projet-linguistique/resources/kanji_png/");
+		File folder=new File(Paths.get(".").toAbsolutePath().normalize().toString() + "/resources/kanji_png/");
 		File[] files=folder.listFiles();
 		for(int i=0;i<files.length;i++) {
 			String filename=files[i].getName();
