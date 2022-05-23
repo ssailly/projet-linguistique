@@ -20,7 +20,7 @@ import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 
 public class PngManip {
-	private static final int IMG_SIZE=109;
+	public static final int IMG_SIZE=109;
 	public static final String output_path=Paths.get(".").toAbsolutePath().normalize().toString()+"/resources/image_output/image.png";
 	public static final String kanji_png=Paths.get(".").toAbsolutePath().normalize().toString()+"/resources/kanji_png/";
 

@@ -17,6 +17,7 @@ import org.opencv.core.MatOfByte;
 import org.opencv.core.Point;
 import org.opencv.core.Rect;
 import org.opencv.core.Scalar;
+import org.opencv.core.Size;
 import org.opencv.imgcodecs.Imgcodecs;
 import org.opencv.imgproc.Imgproc;
 
@@ -95,7 +96,11 @@ public class Handwriting {
 					Mat roiBW = new Mat();
 					Imgproc.adaptiveThreshold(roiGrey, roiBW, 255,Imgproc.ADAPTIVE_THRESH_MEAN_C, Imgproc.THRESH_BINARY, 15, 40);
 					String roiFilename = DIR + src + "_roi";
-					saveMat(roiBW, roiFilename + ++k + ".png");
+					Mat roiScaled = new Mat();
+					int size = PngManip.IMG_SIZE;
+					boolean interpolationType = size < h1;//interpolation différente selon qu'il s'agisse d'un upscaling ou d'un downscaling
+					Imgproc.resize(roiBW, roiScaled, new Size(size, size), 0, 0, interpolationType ? Imgproc.INTER_AREA : Imgproc.INTER_CUBIC);
+					saveMat(roiScaled, roiFilename + ++k + ".png");
 					roiFilenames.add(roiFilename);
 				}
 			}
