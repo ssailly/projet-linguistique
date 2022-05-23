@@ -3,8 +3,9 @@ package fr.upcite;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.File;
-import java.io.FileWriter;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStreamWriter;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -23,26 +24,31 @@ import org.opencv.imgproc.Imgproc;
 
 public class Handwriting {
 	private static final String DIR = Paths.get(".").toAbsolutePath().normalize().toString() + "/resources/handwriting/";
-	private static final String DEFAULT_TRG = "trg.png";
+	private static final String DEFAULT_TRG = DIR + "trg.png";
 	private static ArrayList<Kanji> kanji=Kanji.createList();
 
 	private static void saveMat(Mat mat, String trg) {
+		saveMat(mat, trg, false);
+	}
+
+	private static void saveMat(Mat mat, String trg, boolean transparent) {
 		if(trg.equals("")) trg = DEFAULT_TRG;
 		MatOfByte mob = new MatOfByte();
 		Imgcodecs.imencode(".png", mat, mob);
 		byte ba[] = mob.toArray();
 		try {
 			BufferedImage img = ImageIO.read(new ByteArrayInputStream(ba));
-			ImageIO.write(img, "png", new File(DIR + trg));
+			if(transparent) img = PngManip.whiteToTransparent(img);
+			ImageIO.write(img, "png", new File(trg));
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 	}
 
 	public static void main(String[] args) {
-		String src = args.length > 0 ? args[0].substring(0, args[0].length() - 4) : DIR + "src";
+		String src = DIR + (args.length > 0 ? args[0].substring(0, args[0].length() - 4) : "src");
 		nu.pattern.OpenCV.loadLocally();
-		Mat orig = Imgcodecs.imread(src);
+		Mat orig = Imgcodecs.imread(src + ".png");
 		Mat mat = new Mat();
 		orig.copyTo(mat);
 		Mat matGrey = new Mat();
@@ -78,8 +84,8 @@ public class Handwriting {
 				Imgproc.line(cannyColor, p1, p2, new Scalar(0, 255, 0), 2);
 			}
 		}
-		saveMat(mat, DIR + src + "_houghLines.png");
-		saveMat(cannyColor, DIR + src + "_houghLinesCanny.png");
+		saveMat(mat, src + "_houghLines.png");
+		saveMat(cannyColor, src + "_houghLinesCanny.png");
 		for(ArrayList<Integer> list : pts) Collections.sort(list);
 
 		int k = 0;
@@ -95,20 +101,21 @@ public class Handwriting {
 					Imgproc.cvtColor(roi, roiGrey, Imgproc.COLOR_BGR2GRAY);
 					Mat roiBW = new Mat();
 					Imgproc.adaptiveThreshold(roiGrey, roiBW, 255,Imgproc.ADAPTIVE_THRESH_MEAN_C, Imgproc.THRESH_BINARY, 15, 40);
-					String roiFilename = DIR + src + "_roi";
+					String roiFilename = src + "_roi" + ++k + ".png";
 					Mat roiScaled = new Mat();
 					int size = PngManip.IMG_SIZE;
 					boolean interpolationType = size < h1;//interpolation différente selon qu'il s'agisse d'un upscaling ou d'un downscaling
 					Imgproc.resize(roiBW, roiScaled, new Size(size, size), 0, 0, interpolationType ? Imgproc.INTER_AREA : Imgproc.INTER_CUBIC);
-					saveMat(roiScaled, roiFilename + ++k + ".png");
+					saveMat(roiScaled, roiFilename, true);
 					roiFilenames.add(roiFilename);
 				}
 			}
 		}
 		try {
-			File result = new File(DIR + src + "_output.txt");
+			File result = new File(src + "_output.txt");
 			result.createNewFile();
-			FileWriter writer = new FileWriter(result.getAbsolutePath());
+			OutputStreamWriter osw = new OutputStreamWriter(new FileOutputStream(result), "UTF-8");
+
 			for(String s : roiFilenames) {
 				for(Kanji kj : kanji){
 					kj.setSimilarity(PngManip.imagesSimilarity(s, PngManip.kanji_png+kj.filename));
@@ -116,9 +123,10 @@ public class Handwriting {
 				Kanji sim = Collections.max(kanji, Kanji.getComparator());
 				char toWrite = sim.kanji.charAt(0);
 				if(sim.getSimilarity() < 0.5) toWrite = ' ';
-				writer.write(toWrite);
+				osw.write(toWrite);
+				osw.flush();
 			}
-			writer.close();
+			osw.close();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

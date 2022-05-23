@@ -43,6 +43,50 @@ public class PngManip {
 		}
 	}
 
+	public static BufferedImage whiteToTransparent(BufferedImage img){
+		BufferedImage res = new BufferedImage(img.getWidth(), img.getHeight(), BufferedImage.TYPE_INT_ARGB);
+		try {
+			int[] pixels = img.getRGB(0, 0, img.getWidth(), img.getHeight(), null, 0, img.getWidth());
+			for(int i=0;i<pixels.length;i++){
+				int color = pixels[i];
+				int a = (color>>24)&0xFF, r = (color>>16)&0xFF, g = (color>>8)&0xFF, b = (color)&0xFF;
+				if(r == 255 && g == 255 && b == 255) a = 0;
+				pixels[i] = (a<<24) | (r<<16) | (g<<8) | (b);
+			}
+			res.setRGB(0, 0, img.getWidth(), img.getHeight(), pixels, 0, img.getWidth());
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return res;
+	}
+
+	public static void whiteToTransparent(){
+		try {
+			BufferedImage bi = ImageIO.read(new File("src_roi1.png"));
+			int[] pixels = bi.getRGB(0, 0, bi.getWidth(), bi.getHeight(), null, 0, bi.getWidth());
+
+			for(int i=0;i<pixels.length;i++){
+					int color = pixels[i];
+					int a = (color>>24)&255;
+					int r = (color>>16)&255;
+					int g = (color>>8)&255;
+					int b = (color)&255;
+
+					if(r == 255 && g == 255 && b == 255){
+							a = 0;
+					}
+
+					pixels[i] = (a<<24) | (r<<16) | (g<<8) | (b);
+			}
+
+			BufferedImage biOut = new BufferedImage(bi.getWidth(), bi.getHeight(), BufferedImage.TYPE_INT_ARGB);
+			biOut.setRGB(0, 0, bi.getWidth(), bi.getHeight(), pixels, 0, bi.getWidth());
+			ImageIO.write(biOut, "png", new File("src_roiT.png"));
+		} catch (Exception e) {
+			//TODO: handle exception
+		}
+	}
+
 	public static double imagesSimilarity(String path1, String path2){
 		File f1=new File(path1), f2=new File(path2);
 		double res=0.0;
@@ -96,6 +140,7 @@ public class PngManip {
 	}
 
 	public static void main(String[] args) {
-		imagesSimilarity(PngManip.output_path, PngManip.kanji_png+"0608b.png");
+		//imagesSimilarity(PngManip.output_path, PngManip.kanji_png+"0608b.png");
+		whiteToTransparent();
 	}
 }
